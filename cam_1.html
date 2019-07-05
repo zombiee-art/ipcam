@@ -1,0 +1,66 @@
+
+<pre id='token' style='display: none'>8a3af0fc60e6f14df93686d47ebf1e73</pre>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ТБО «Балашиха»</title>
+        <meta charset="utf-8">
+        <meta http-equiv="cache-control" content="max-age=0" />
+        <meta http-equiv="cache-control" content="no-cache" />
+        <meta http-equiv="expires" content="0" />
+        <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+        <meta http-equiv="pragma" content="no-cache" />
+        <script src="https://video.mosreg.ru/apps/clappr/0.2.86/dist/clappr.min.js"></script>
+    </head>
+    <body background="#000000" style="margin:0;padding:0">
+    	<div style="margin:0;padding:0" class="player expand" id="cam_video"></div>
+    </body>
+</html>
+
+<script>
+
+    $('.expand').dblclick(function() {
+        if( $(this).parent().hasClass('expanded') ) {
+            $(this).parent().removeClass('expanded');
+        } else {
+            $(this).parent().addClass('expanded');
+        }
+    });
+    $.ajax({
+        type:   "GET",
+        url:    "http://video.mosreg.ru/tbo_balashiha/",
+        success: (resp) => {
+	        debugger;
+	        console.log(resp);
+			let camerasSRC = 'https://video.mosreg.ru/api/camera/list/byregion?region_id=1167&token=' + token;
+	   		let jqxhrPlaylist = $.ajax({
+	        type:   "GET",
+	        url:    camerasSRC,
+	        success: (resp) => {
+	            for (let i = 0; i < resp.camera_array.length; i++) {
+					if (resp.camera_array[i].id == 20732){
+	                        console.log(resp.camera_array[i]);
+							if (resp.camera_array[i].sstatecode !== -11 && resp.camera_array[i].sstatecode !== -2 && resp.camera_array[i].sstatecode !== 1) continue;
+
+	                    	let playerObj = new Clappr.Player({
+								source: resp.camera_array[i].hls_stream,
+								parentId: '#cam_video',
+								autoPlay: true,
+	                            exitFullscreenOnEnd: false,
+								width: '100%',
+								height: '100%'
+							});
+
+							playerObj.on(Clappr.Events.PLAYER_ERROR, () => {
+								setTimeout(function() {
+									playerObj.stop();
+									playerObj.play();
+								}, 1000);
+							});
+						} 
+					}
+				}
+        	});
+    	}
+	});
+</script>
